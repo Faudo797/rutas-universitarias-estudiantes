@@ -13,7 +13,7 @@ class User(AbstractUser):
         default='avatars/default-avatar.png',
     )
     phone = models.CharField(max_length=20, blank=True)
-    identificacion = models.CharField(max_length=10, blank=True, unique=True)
+    identificacion = models.CharField(max_length=10, blank=True)
     gps_latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     gps_longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     verified_email = models.BooleanField(default=False)
@@ -95,6 +95,8 @@ class Permission(models.Model):
     description = models.TextField(blank=True)
     resources = models.ManyToManyField(Resource, related_name="permissions", blank=True)
 
+from django.db import models
+
 class Ruta(models.Model):
     nombre_ruta = models.CharField(max_length=100, verbose_name="Nombre de la ruta")
     capacidad_activa = models.IntegerField(blank=True, null=True, verbose_name="Capacidad activa")
@@ -115,8 +117,14 @@ class Bus(models.Model):
     capacidad = models.IntegerField(blank=True, null=True, verbose_name="Capacidad del bus")
     estado_bus = models.CharField(max_length=50, verbose_name="Estado del bus")
     
-    #muchos buses pertenecen a una sola ruta
-    ruta = models.ForeignKey(Ruta, on_delete=models.CASCADE, related_name="buses")
+    # Un bus pertenece a exactamente una ruta
+    ruta = models.ForeignKey(
+        Ruta,
+        on_delete=models.CASCADE,
+        related_name="buses",
+        null=False,
+        blank=False
+    )
 
     def __str__(self):
         return f"{self.placa} - {self.marca}"
@@ -131,7 +139,7 @@ class Parada(models.Model):
     direccion = models.CharField(max_length=150, verbose_name="Dirección")
     tipo_punto = models.CharField(max_length=50, verbose_name="Tipo de punto")
     
-    # muchas paradas pertenecen a una ruta
+    # Muchas paradas pertenecen a una ruta
     ruta = models.ForeignKey(Ruta, on_delete=models.CASCADE, related_name="paradas")
 
     def __str__(self):
@@ -146,7 +154,7 @@ class TipoEstado(models.Model):
     nombre_estado = models.CharField(max_length=100, verbose_name="Nombre del estado")
     descripcion = models.TextField(blank=True, null=True, verbose_name="Descripción del estado")
     
-    # muchos estados pertenecen a una ruta
+    # Muchos estados pertenecen a una ruta
     ruta = models.ForeignKey(Ruta, on_delete=models.CASCADE, related_name="tipos_estado")
 
     def __str__(self):
