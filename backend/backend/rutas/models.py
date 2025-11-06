@@ -1,7 +1,6 @@
 from django.db import models
 
 
-
 class Ruta(models.Model):
     nombre_ruta = models.CharField(max_length=100, verbose_name="Nombre de la ruta")
     capacidad_activa = models.IntegerField(blank=True, null=True, verbose_name="Capacidad activa")
@@ -22,13 +21,13 @@ class Bus(models.Model):
     capacidad = models.IntegerField(blank=True, null=True, verbose_name="Capacidad del bus")
     estado_bus = models.CharField(max_length=50, verbose_name="Estado del bus")
     
-    # Un bus pertenece a exactamente una ruta
+    # Un bus posee una ruta, pero puede cambiarse si se vara
     ruta = models.ForeignKey(
         Ruta,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="buses",
-        null=False,
-        blank=False
+        null=True,
+        blank=True
     )
 
     def __str__(self):
@@ -37,7 +36,6 @@ class Bus(models.Model):
     class Meta:
         verbose_name = "Bus"
         verbose_name_plural = "Buses"
-
 
 class Parada(models.Model):
     nombre_parada = models.CharField(max_length=100, verbose_name="Nombre de la parada")
